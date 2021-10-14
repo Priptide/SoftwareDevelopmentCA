@@ -3,14 +3,7 @@ import java.util.Scanner;
 
 public class PebbleGame {
 
-  public static void main(String[] args) {
-    System.out.println(
-      "Welcome to the PebbleGame!!\n" +
-      "You will be asked to enter the number of players.\n" +
-      "and then for the location of the three files in turn containing comma separated integer values for the pebble weights.\n" +
-      "The integer values must be strictly positive.\n" +
-      "The game will then be simulated, and output written to files in this directory.\n"
-    );
+  public static void startMenu() {
     System.out.println("Please enter the number of players:");
 
     Scanner sc = new Scanner(System.in);
@@ -26,13 +19,13 @@ public class PebbleGame {
     try {
       playerCount = playerCountHold = Integer.parseInt(key);
       if (playerCount <= 0) {
-        System.out.println("You can't play with no one you freak!");
-        System.exit(-1);
+        System.out.println("You can't play with no one you freak!\n");
+        startMenu();
       }
     } catch (Exception e) {
       //Invalid so we restart
-      System.out.println("Invalid Input!");
-      System.exit(-1);
+      System.out.println("Invalid Input!\n");
+      startMenu();
     }
 
     while (playerCount > 0) {
@@ -51,5 +44,16 @@ public class PebbleGame {
       ); else playerCount--;
     }
     sc.close();
+  }
+
+  public static void main(String[] args) {
+    System.out.println(
+      "Welcome to the PebbleGame!!\n" +
+      "You will be asked to enter the number of players.\n" +
+      "and then for the location of the three files in turn containing comma separated integer values for the pebble weights.\n" +
+      "The integer values must be strictly positive.\n" +
+      "The game will then be simulated, and output written to files in this directory.\n"
+    );
+    startMenu();
   }
 }
