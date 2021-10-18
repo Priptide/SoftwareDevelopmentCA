@@ -2,11 +2,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Random;
 
 public class PebbleGame {
 
   static int playerCount;
   static List<Bag> currentBags = new ArrayList<>();
+  static List<Player> players;
 
   public static void startMenu() {
     System.out.println("Please enter the number of players:");
@@ -59,6 +61,21 @@ public class PebbleGame {
     sc.close();
   }
 
+  static Random random = new Random();
+
+  public static void createGame() {
+    for(int i = 0; i < playerCount; i++) {
+      players.add(new Player());
+    }
+
+    for(Player p : players) {
+      int randomNum = random.nextInt(currentBags.size());
+      p.setBlackBag(currentBags.get(randomNum));
+    }
+
+  }
+
+  
   public static void main(String[] args) {
     System.out.println(
             """
