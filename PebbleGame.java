@@ -5,20 +5,16 @@ import java.util.Scanner;
 
 public class PebbleGame {
 
+  static int playerCount;
+  static List<Bag> currentBags = new ArrayList<>();
+
   public static void startMenu() {
     System.out.println("Please enter the number of players:");
-
     Scanner sc = new Scanner(System.in);
-
     String key = sc.nextLine();
-
-    if (key.equalsIgnoreCase("e")) System.exit(1);
-
-    int playerCount = 0;
-
     int playerCountHold = 0;
 
-    List<Bag> currentBags = new ArrayList<>();
+    if (key.equalsIgnoreCase("e")) System.exit(1);
     
     try {
       playerCount = playerCountHold = Integer.parseInt(key);
@@ -74,7 +70,5 @@ public class PebbleGame {
                     """
     );
     startMenu();
-  
-
-}
+  }
 }
