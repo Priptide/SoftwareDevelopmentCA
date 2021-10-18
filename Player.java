@@ -12,6 +12,12 @@ public class Player {
     public void setHand(List<Integer> hand) {
         this.hand = hand;
     }
+    public int handSize() {
+        return hand.size();
+    }
+    public int sum() {
+        return hand.stream().reduce(0, Integer::sum);
+    }
 
     public Bag getBlackBag() {
         return blackBag;

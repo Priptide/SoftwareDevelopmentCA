@@ -79,7 +79,6 @@ public class PebbleGame {
       int randomNum = random.nextInt(currentBags.size());
       p.setBlackBag(currentBags.get(randomNum));
     }
-
   }
 
   
