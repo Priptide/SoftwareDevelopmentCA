@@ -1,4 +1,6 @@
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class PebbleGame {
@@ -15,6 +17,8 @@ public class PebbleGame {
     int playerCount = 0;
 
     int playerCountHold = 0;
+
+    List<Bag> currentBags = new ArrayList<>();
     
     try {
       playerCount = playerCountHold = Integer.parseInt(key);
@@ -37,11 +41,26 @@ public class PebbleGame {
 
       String filePath = sc.nextLine();
 
-      File myObj = new File(filePath);
+      File currentFile = new File(filePath);
 
-      if (!myObj.exists()) System.out.println(
-        "File doesn't exist try again!"
-      ); else playerCount--;
+      if (!currentFile.exists()) System.out.println(
+        "The given file doesn't exist, try again!"
+      ); else {
+        playerCount--;
+
+        Bag newBag = new Bag(currentFile, BagType.BLACK);
+
+        try {
+          newBag.load();
+        } catch (Exception e) {
+          System.out.println(e.toString());
+          break;
+        }
+
+        currentBags.add(newBag);
+
+        System.out.println(newBag.getContents());
+      }
     }
     sc.close();
   }

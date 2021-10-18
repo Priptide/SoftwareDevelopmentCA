@@ -64,9 +64,17 @@ public class Bag {
    * @throws FileNotFoundException This should never throw but could if there is a load called and the file is deleted at the same time.
    * @throws Exception If there is not file there anymore or the bag you are loading is white.
    */
-  public void Load() throws Exception {
+  public void load() throws Exception {
     if (inputFile.exists() && type == BagType.BLACK) {
       FileReader fileReader = new FileReader(inputFile);
+      int data = fileReader.read();
+      while (data != -1) {
+        if (data != ',') {
+          contents.add(data);
+        }
+        data = fileReader.read();
+      }
+      fileReader.close();
     } else {
       throw new Exception(
         type == BagType.WHITE
@@ -81,7 +89,7 @@ public class Bag {
    *
    * @return Current contents of the bag.
    */
-  public List<Integer> getBag() {
+  public List<Integer> getContents() {
     return contents;
   }
 
