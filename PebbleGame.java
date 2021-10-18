@@ -10,12 +10,12 @@ public class PebbleGame {
 
     String key = sc.nextLine();
 
-    if (key.toLowerCase().equals("e")) System.exit(1);
+    if (key.equalsIgnoreCase("e")) System.exit(1);
 
     int playerCount = 0;
 
     int playerCountHold = 0;
-
+    
     try {
       playerCount = playerCountHold = Integer.parseInt(key);
       if (playerCount <= 0) {
@@ -48,11 +48,13 @@ public class PebbleGame {
 
   public static void main(String[] args) {
     System.out.println(
-      "Welcome to the PebbleGame!!\n" +
-      "You will be asked to enter the number of players.\n" +
-      "and then for the location of the three files in turn containing comma separated integer values for the pebble weights.\n" +
-      "The integer values must be strictly positive.\n" +
-      "The game will then be simulated, and output written to files in this directory.\n"
+            """
+                    Welcome to the PebbleGame!!
+                    You will be asked to enter the number of players.
+                    and then for the location of the three files in turn containing comma separated integer values for the pebble weights.
+                    The integer values must be strictly positive.
+                    The game will then be simulated, and output written to files in this directory.
+                    """
     );
     startMenu();
   }
