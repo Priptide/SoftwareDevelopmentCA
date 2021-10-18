@@ -68,11 +68,24 @@ public class Bag {
     if (inputFile.exists() && type == BagType.BLACK) {
       FileReader fileReader = new FileReader(inputFile);
       int data = fileReader.read();
+      String currentValue = "";
       while (data != -1) {
-        if (data != ',') {
-          contents.add(data);
+        if ((char) data != ',') {
+          currentValue += (char) data;
+        } else {
+          if (!currentValue.trim().equals("")) {
+            try {
+              contents.add(Integer.parseInt(currentValue.trim()));
+            } catch (Exception e) {}
+          }
+          currentValue = "";
         }
         data = fileReader.read();
+      }
+      if (!currentValue.trim().equals("")) {
+        try {
+          contents.add(Integer.parseInt(currentValue.trim()));
+        } catch (Exception e) {}
       }
       fileReader.close();
     } else {

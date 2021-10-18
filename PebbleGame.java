@@ -58,8 +58,6 @@ public class PebbleGame {
         }
 
         currentBags.add(newBag);
-
-        System.out.println(newBag.getContents());
       }
     }
     sc.close();
@@ -76,5 +74,7 @@ public class PebbleGame {
                     """
     );
     startMenu();
-  }
+  
+
+}
 }
