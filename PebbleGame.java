@@ -61,8 +61,15 @@ public class PebbleGame {
     sc.close();
   }
 
+  /**
+   * Method to create a random number accessible by all functions in the class
+   */
   static Random random = new Random();
 
+  /**
+   * Method to start the game, creating a list of players.
+   * Then assigning bags to those players.
+   */
   public static void createGame() {
     for(int i = 0; i < playerCount; i++) {
       players.add(new Player());
