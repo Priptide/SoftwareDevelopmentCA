@@ -12,9 +12,10 @@ public class PlayerTurn extends Thread {
             while (p.handSize() < 10) {
                 hand.add(p.getBlackBag().pick());
             }
- 			//if(hand.sum() => 100) {
-            //    stopThread();
-            //}
+
+ 			if(p.sum() >= 100) {
+                stopThread();
+            } //else remove one pebble and "call run again"
  			
  	 	}
     }
