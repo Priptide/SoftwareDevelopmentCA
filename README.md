@@ -17,3 +17,9 @@ Requirements:
 
 - [ ] If a player attempts to draw from an empty black bag, the player should attempt to select another bag until they select a bag with pebbles. 
 Pebbles must have a strictly positive weight – therefore the program should detect and warn the user if they are trying to use files where this is not the case
+
+
+TODO:
+
+- [ ] Add fix for empty line inputs.
+- [ ] Add fix for bags being empty when they are picked make it throw an error.

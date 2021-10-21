@@ -14,9 +14,9 @@ public class Bag {
   List<Integer> contents;
 
   /**
-   * @apiNote This version should only be used for creating a white bag.
-   *
    * Creates a new bag object with no contents, hence an empty bag to use in the pebble game.
+   *
+   * @apiNote This version should only be used for creating a white bag.
    *
    * @param type Can be given as either but should be only BagType.WHITE
    */
@@ -27,9 +27,9 @@ public class Bag {
   }
 
   /**
-   * @apiNote Please use the load function after initializing a black bag the bag will be empty.
-   *
    * Creates a bag object which can be used to play the pebble game.
+   *
+   * @apiNote Please use the load function after initializing a black bag the bag will be empty.
    *
    * @param inputFile Used when creating a black bag, needs to be a readable csv file.
    * @param type The type of bag, either white or black.
@@ -41,14 +41,16 @@ public class Bag {
   }
 
   /**
-   * @deprecated Should only be used in testing.
    *
-   * Creates a new bag object with a list of contents for use in the pebble game.
+   * Creates a bag object with a list of contents for use in the pebble game.
+   *
+   * @deprecated Should only be used in testing.
    *
    * @param inputFile The CSV of bag contents
    * @param type The type of bag, either white or black.
    * @param contents The current contents of the bag.
    */
+  @Deprecated
   public Bag(File inputFile, BagType type, List<Integer> contents) {
     this.inputFile = inputFile;
     this.type = type;
@@ -56,10 +58,10 @@ public class Bag {
   }
 
   /**
-   * @apiNote Don't try load an empty file or a white bag as these cannot be loaded and will throw exceptions
-   *
    * As we check the input in our pebble game file this should never
    * throw a FileNotFound exception although will need to be put in a try-catch method.
+   *
+   * @apiNote Don't try load an empty file or a white bag as these cannot be loaded and will throw exceptions
    *
    * @throws FileNotFoundException This should never throw but could if there is a load called and the file is deleted at the same time.
    * @throws Exception If there is not file there anymore or the bag you are loading is white.
@@ -107,9 +109,10 @@ public class Bag {
   }
 
   /**
-   * @apiNote Should be the only method used to add to the bag.
    *
    * Adds a single value to the current contents of the bag.
+   *
+   * @apiNote Should be the only method used to add to the bag.
    *
    * @param value Integer to add to the bag.
    */
@@ -118,12 +121,13 @@ public class Bag {
   }
 
   /**
-   * @deprecated Should only be used for testing.
-   *
    * Adds a list of values to the currents contents of the bag.
+   *
+   * @deprecated Should only be used for testing.
    *
    * @param values List of values to add to the bag.
    */
+  @Deprecated
   public void addListToBag(List<Integer> values) {
     this.contents.addAll(values);
   }
