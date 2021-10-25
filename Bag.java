@@ -67,18 +67,37 @@ public class Bag {
    * @throws Exception If there is not file there anymore or the bag you are loading is white.
    */
   public void load() throws Exception {
-    if (inputFile.exists() && type == BagType.BLACK) {
+    if (
+      inputFile != null &&
+      inputFile.exists() &&
+      inputFile.isFile() &&
+      inputFile.canRead() &&
+      type == BagType.BLACK
+    ) {
       FileReader fileReader = new FileReader(inputFile);
       int data = fileReader.read();
       String currentValue = "";
       while (data != -1) {
         if ((char) data != ',') {
+          //While we haven't met a comma we keep adding the characters to make the value.
           currentValue += (char) data;
         } else {
+          //We trim the value and check it isn't a null value
           if (!currentValue.trim().equals("")) {
+            int value = 0;
             try {
-              contents.add(Integer.parseInt(currentValue.trim()));
-            } catch (Exception e) {}
+              value = Integer.parseInt(currentValue.trim());
+            } catch (Exception e) {
+              fileReader.close();
+              throw new Exception(
+                "You can only load values that are integers!"
+              );
+            }
+            if (value > 0) contents.add(value); else {
+              System.out.println(
+                "Pebbles have a strictly positive weight negative values will not be loaded!"
+              );
+            }
           }
           currentValue = "";
         }
@@ -93,8 +112,8 @@ public class Bag {
     } else {
       throw new Exception(
         type == BagType.WHITE
-          ? "Can't load for a white bag"
-          : "The file provide for this bag has been deleted"
+          ? "Can't load into a white bag"
+          : "Please provide a valid, readable file to load from for this bag"
       );
     }
   }

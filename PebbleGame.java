@@ -86,7 +86,9 @@ public class PebbleGame {
 
     for(Player p : players) {
       int randomNum = random.nextInt(currentBags.size());
-      p.setBlackBag(currentBags.get(randomNum));
+      Bag indexBag = currentBags.keySet().toArray(new Bag[currentBags.size()])[randomNum];
+      p.setBlackBag(indexBag);
+      p.setWhiteBag(currentBags.get(indexBag));
     }
   }
 
