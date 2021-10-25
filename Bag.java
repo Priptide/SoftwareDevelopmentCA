@@ -109,6 +109,10 @@ public class Bag {
         } catch (Exception e) {}
       }
       fileReader.close();
+
+      if (contents.size() == 0) System.out.println(
+        "Nothing was loaded into this bag"
+      );
     } else {
       throw new Exception(
         type == BagType.WHITE
@@ -165,10 +169,18 @@ public class Bag {
    *
    * @return A random value for the current bag.
    */
-  public synchronized int pick() {
-    Random rand = new Random();
-    int index = rand.nextInt(contents.size());
-    removeValueFromBag(index);
-    return contents.get(index);
+  public synchronized int pick() throws Exception {
+    if (contents.size() > 0 && type == BagType.BLACK) {
+      Random rand = new Random();
+      int index = rand.nextInt(contents.size());
+      removeValueFromBag(index);
+      return contents.get(index);
+    } else {
+      throw new Exception(
+        type == BagType.WHITE
+          ? "You can't pick from a white bag"
+          : "You can't pick from an empty bag"
+      );
+    }
   }
 }

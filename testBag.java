@@ -1,10 +1,29 @@
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.net.URL;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public class testBag {
+
+  private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+  private final PrintStream originalOut = System.out;
+
+  //Set up for listening to warnings
+  @Before
+  public void setUpStreams() {
+    System.setOut(new PrintStream(outContent));
+  }
+
+  //Restore streams for warnings
+  @After
+  public void restoreStreams() {
+    System.setOut(originalOut);
+  }
 
   //Test loading a black bag with no file
   @Test
@@ -23,7 +42,7 @@ public class testBag {
     URL url = this.getClass().getResource("/test_file_1.csv");
     File testFile = new File(url.getFile());
     if (!testFile.exists()) {
-      throw new AssertionError("Can't find file!");
+      throw new AssertionError("Can't find test file!");
     }
     Bag test = new Bag(testFile, BagType.BLACK);
 
@@ -33,10 +52,60 @@ public class testBag {
     } catch (Exception e) {
       throw new AssertionError("Failed to load test file: " + e.getMessage());
     }
+
+    assertEquals(
+      "Pebbles have a strictly positive weight negative values will not be loaded!",
+      outContent.toString().trim()
+    );
+
     //Check we only have one value
     assertEquals(1, test.getContents().size());
 
     //Check this value is the 12 we put in.
     assertEquals(12, (int) test.getContents().get(0));
+  }
+
+  //Test trying to load from an empty file
+  @Test
+  public void testEmptyFile() {
+    URL url = this.getClass().getResource("/test_file_2.csv");
+    File testFile = new File(url.getFile());
+    Bag test = new Bag(testFile, BagType.BLACK);
+
+    try {
+      test.load();
+    } catch (Exception e) {
+      throw new AssertionError("Failed to load test file: " + e.getMessage());
+    }
+
+    assertEquals(
+      "Nothing was loaded into this bag",
+      outContent.toString().trim()
+    );
+  }
+
+  //Test trying to pick from an empty bag
+  @Test
+  public void testEmptyPick() {
+    URL url = this.getClass().getResource("/test_file_2.csv");
+    File testFile = new File(url.getFile());
+    Bag test = new Bag(testFile, BagType.BLACK);
+
+    try {
+      test.load();
+    } catch (Exception e) {
+      throw new AssertionError("Failed to load test file: " + e.getMessage());
+    }
+
+    Throwable exception = assertThrows(Exception.class, () -> test.pick());
+    assertEquals("You can't pick from an empty bag", exception.getMessage());
+  }
+
+  @Test
+  public void testWhitePick() {
+    Bag test = new Bag(BagType.WHITE);
+
+    Throwable exception = assertThrows(Exception.class, () -> test.pick());
+    assertEquals("You can't pick from a white bag", exception.getMessage());
   }
 }
