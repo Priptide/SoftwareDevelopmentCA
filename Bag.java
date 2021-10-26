@@ -95,7 +95,7 @@ public class Bag {
             }
             if (value > 0) contents.add(value); else {
               System.out.println(
-                "Pebbles have a strictly positive weight negative values will not be loaded!"
+                "WARNING: Pebbles have a strictly positive weight negative values will not be loaded!"
               );
             }
           }
@@ -111,7 +111,7 @@ public class Bag {
       fileReader.close();
 
       if (contents.size() == 0) System.out.println(
-        "Nothing was loaded into this bag"
+        "WARNING: Nothing was loaded from the given file into this bag"
       );
     } else {
       throw new Exception(

@@ -54,7 +54,7 @@ public class testBag {
     }
 
     assertEquals(
-      "Pebbles have a strictly positive weight negative values will not be loaded!",
+      "WARNING: Pebbles have a strictly positive weight negative values will not be loaded!",
       outContent.toString().trim()
     );
 
@@ -79,7 +79,7 @@ public class testBag {
     }
 
     assertEquals(
-      "Nothing was loaded into this bag",
+      "WARNING: Nothing was loaded from the given file into this bag",
       outContent.toString().trim()
     );
   }

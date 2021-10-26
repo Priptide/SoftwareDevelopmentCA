@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
 import java.util.Random;
 
 public class PebbleGame {
@@ -12,11 +13,17 @@ public class PebbleGame {
   static List<Player> players;
   static Map<Bag, Bag> currentBags;
   public static boolean gamePlayable = false;
+  Scanner sc = new Scanner(System.in);
 
   public void startMenu() throws Exception{
     System.out.println("Please enter the number of players:");
-    Scanner sc = new Scanner(System.in);
-    String key = sc.nextLine();
+    String key = "";
+    try{
+      key = sc.nextLine();
+    }
+    catch(Exception e){
+      throw new Exception("Invalid Input! \n");
+    }
     currentBags = new HashMap<>();
 
     if (key.equalsIgnoreCase("e")) System.exit(1);
@@ -24,25 +31,32 @@ public class PebbleGame {
     try {
       playerCount = Integer.parseInt(key);
       if (playerCount <= 0) {
-        sc.close();
-        throw new Exception("You can't play with no one!\n");
+        throw new Exception("You can't play with zero players!\n");
       }
     } catch (Exception e) {
       //Invalid so we restart
-      sc.close();
-      throw new Exception("Invalid Input!\n");
+      throw new Exception("Please input a number!\n");
     }
 
     int bagCount = 0;
+    
+    int currentPebbleCount = 0;
 
-    while (bagCount < 2) {
+    while (bagCount < 3) {
       System.out.println(
         "Please enter location of bag number " +
         (bagCount) +
         " to load"
       );
 
-      String filePath = sc.nextLine();
+      String filePath = "";
+      try{
+       filePath = sc.nextLine();
+      }
+      catch(Exception e){
+        System.out.println("Invalid input!\n");
+        continue;
+       }
 
       File currentFile = new File(filePath);
 
@@ -56,16 +70,23 @@ public class PebbleGame {
         try {
           newBlackBag.load();
         } catch (Exception e) {
-          System.out.println(e.toString());
-          break;
+          System.out.println(e.toString() + "\n");
+          continue;
         }
 
         currentBags.put(newBlackBag, newWhiteBag);
         
         bagCount++;
+        currentPebbleCount += newBlackBag.contents.size();
       }
     }
-    sc.close();
+
+    //Check the bag count is above 11 per player
+    int minCount = playerCount * 11;
+
+    if(minCount > currentPebbleCount){
+      throw new Exception("\nYou must have at least 11 pebbles per player, you were "+ (minCount - currentPebbleCount) +" pebbles short!\nPlease try again!\n");
+    }
   }
 
 
