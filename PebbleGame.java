@@ -22,7 +22,7 @@ public class PebbleGame {
       key = sc.nextLine();
     }
     catch(Exception e){
-      throw new Exception("Invalid Input! \n");
+      throw new Exception("Invalid Input!\n");
     }
     currentBags = new HashMap<>();
 
@@ -113,9 +113,10 @@ public class PebbleGame {
     }
   }
 
+
+
   
   public void play() {
-
       System.out.println(
               """
                       Welcome to the PebbleGame!!

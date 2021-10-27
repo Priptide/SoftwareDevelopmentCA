@@ -36,6 +36,31 @@ public class testBag {
     );
   }
 
+  //Test loading a file that isn't fully comma separated
+  @Test
+  public void invalidFormat() {
+    URL url = this.getClass().getResource("/test_file_3.csv");
+    File testFile = new File(url.getFile());
+    if (!testFile.exists()) {
+      throw new AssertionError("Can't find test file!");
+    }
+    Bag test = new Bag(testFile, BagType.BLACK);
+
+    //We don't need to worry about this as an error will be the fault of something else
+    try {
+      test.load();
+    } catch (Exception e) {
+      throw new AssertionError("Failed to load test file: " + e.getMessage());
+    }
+
+    assertEquals(4, test.contents.size());
+
+    assertEquals(
+      "WARNING: A pebble value was not loaded as there was no final comma!",
+      outContent.toString().trim()
+    );
+  }
+
   //Test sending a file containing negative numbers and one positive value.
   @Test
   public void testNegativeFile() {
@@ -46,7 +71,7 @@ public class testBag {
     }
     Bag test = new Bag(testFile, BagType.BLACK);
 
-    //We don't need to worry about this as an error will be
+    //We don't need to worry about this as an error will be the fault of something else
     try {
       test.load();
     } catch (Exception e) {

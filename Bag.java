@@ -104,9 +104,9 @@ public class Bag {
         data = fileReader.read();
       }
       if (!currentValue.trim().equals("")) {
-        try {
-          contents.add(Integer.parseInt(currentValue.trim()));
-        } catch (Exception e) {}
+        System.out.println(
+          "WARNING: A pebble value was not loaded as there was no final comma!"
+        );
       }
       fileReader.close();
 
