@@ -89,7 +89,47 @@ public class PebbleGame {
     }
   }
 
+  class Player extends Thread{
 
+    private List<Integer> hand;
+    private Bag blackBag;
+    private Bag whiteBag;
+  
+    Player() {}
+  
+    public List<Integer> getHand() {
+      return hand;
+    }
+  
+    public void setHand(List<Integer> hand) {
+      this.hand = hand;
+    }
+  
+    public int handSize() {
+      return hand.size();
+    }
+  
+    public int sum() {
+      return hand.stream().reduce(0, Integer::sum);
+    }
+  
+    public Bag getBlackBag() {
+      return blackBag;
+    }
+  
+    public void setBlackBag(Bag blackBag) {
+      this.blackBag = blackBag;
+    }
+  
+    public Bag getWhiteBag() {
+      return whiteBag;
+    }
+  
+    public void setWhiteBag(Bag whiteBag) {
+      this.whiteBag = whiteBag;
+    }
+  }
+  
 
   /**
    * Method to create a random number accessible by all functions in the class
@@ -100,7 +140,7 @@ public class PebbleGame {
    * Method to start the game, creating a list of players.
    * Then assigning bags to those players.
    */
-  public static void createGame() {
+  public void createGame() {
     for(int i = 0; i < playerCount; i++) {
       players.add(new Player());
     }
