@@ -8,9 +8,7 @@ import java.util.Random;
 public class Bag {
 
   File inputFile;
-
   BagType type;
-
   List<Integer> contents;
 
   /**
@@ -41,7 +39,6 @@ public class Bag {
   }
 
   /**
-   *
    * Creates a bag object with a list of contents for use in the pebble game.
    *
    * @deprecated Should only be used in testing.
