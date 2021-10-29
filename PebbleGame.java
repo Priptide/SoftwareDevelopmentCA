@@ -57,7 +57,9 @@ public class PebbleGame {
       catch(Exception e){
         System.out.println("Invalid input!\n");
         continue;
-       }
+      }
+
+      if (key.equalsIgnoreCase("e")) System.exit(1);
 
       File currentFile = new File(filePath);
 
