@@ -17,6 +17,8 @@ public class PebbleGame {
   static List<Bag> currentBags;
   static boolean gamePlayable = false;
   Scanner sc = new Scanner(System.in);
+  // This being volatile should mean that when one thread has one all the threads stop.
+  public volatile boolean done = false;
 
   /**
    * This method is used to run through the initial start of the game to acquire the player number and load all three black bags into the game.
@@ -155,8 +157,6 @@ public class PebbleGame {
     public int sum() {
       return hand.stream().reduce(0, Integer::sum);
     }
-    // This being volatile should mean that when one thread has one all the threads stop.
-    private volatile boolean done = false;
 
     @Override
     public void run (){
@@ -165,7 +165,7 @@ public class PebbleGame {
       hand = new ArrayList<>();
 
       //Create file or load output file
-      File outputFile = new File("player"+ Thread.currentThread().getName()+ "_output.txt");
+      File outputFile = new File("logs/player"+ Thread.currentThread().getName()+ "_output.txt");
 
       //Create file writer.
       FileWriter fileWriter = null;
@@ -183,6 +183,7 @@ public class PebbleGame {
 
 
 		  while (!done){
+
         //If the hand size is greater than 10 we remove a value at random
         if (hand.size() >= 10) {
             int index = random.nextInt(10);
@@ -210,6 +211,9 @@ public class PebbleGame {
         try {
           currentPick = currentBag.pick();
         } catch (Exception e) {
+          //Refill the empty bag causing the error
+          currentBag.addListToBag(bagMap.get(currentBag).getContents());
+          bagMap.get(currentBag).emptyBag();
           //If there is an error the bag is empty so we re-loop until the bag has pebbles
           continue;
         }
@@ -228,14 +232,16 @@ public class PebbleGame {
         try{
           fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n");
           fileWriter.write("player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+          fileWriter.write("hand total: " + hand.stream().reduce(0, Integer::sum) + "\n");
         }
         catch(Exception e)
         {
           System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output! Error: " + e.toString());
         }
 
-        if (hand.stream().reduce(0, Integer::sum) == 100) {
-          System.out.println("Stopped!");
+        if (hand.stream().reduce(0, Integer::sum) == 100 && hand.size() == 10) {
+          // System.out.print("Player " + Thread.currentThread().getName() + " has won!\n");
+          // this.done = true;
           stopThread();
         }
 
@@ -248,7 +254,7 @@ public class PebbleGame {
 
     public void stopThread() {
       System.out.print("Player " + Thread.currentThread().getName() + " has won!\n");
-      this.done = true;
+      done = true;
     }
   }
   

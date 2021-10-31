@@ -36,6 +36,34 @@ public class testBag {
     );
   }
 
+  //Test picking works
+  @Test
+  public void checkPick() {
+    URL url = this.getClass().getResource("/test_file_3.csv");
+    File testFile = new File(url.getFile());
+    Bag test = new Bag(testFile, BagType.BLACK);
+    Bag whiteTest = new Bag(BagType.WHITE);
+    try {
+      test.load();
+    } catch (Exception e) {
+      throw new AssertionError("Failed to load test file: " + e.getMessage());
+    }
+
+    int initCount = test.pebbleCount();
+    for (int i = 0; i < initCount; i++) {
+      try {
+        int temp = test.pick();
+        whiteTest.addValueToBag(temp);
+      } catch (Exception e) {
+        throw new AssertionError("Failed to pick: " + e.getMessage());
+      }
+    }
+
+    assertEquals(test.pebbleCount(), 0);
+
+    assertEquals(initCount, whiteTest.pebbleCount());
+  }
+
   //Test sending a file containing negative numbers and one positive value.
   @Test
   public void testNegativeFile() {

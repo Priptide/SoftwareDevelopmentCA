@@ -11,6 +11,7 @@ public class Bag {
   private BagType type;
   private List<Integer> contents;
   private String bagName;
+  private Random rand = new Random();
 
   /**
    * Creates a new bag object with no contents, hence an empty bag to use in the pebble game.
@@ -205,10 +206,10 @@ public class Bag {
    */
   public synchronized int pick() throws Exception {
     if (contents.size() > 0 && type == BagType.BLACK) {
-      Random rand = new Random();
       int index = rand.nextInt(contents.size());
+      int value = contents.get(index);
       removeValueFromBag(index);
-      return contents.get(index);
+      return value;
     } else {
       throw new Exception(
         type == BagType.WHITE
