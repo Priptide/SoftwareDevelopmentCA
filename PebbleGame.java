@@ -1,5 +1,6 @@
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ public class PebbleGame {
     }
 
     //If the user presses E or e we quit.
-    if (key.equalsIgnoreCase("e")) System.exit(1);
+    if (key.equalsIgnoreCase("e")) System.exit(0);
 
     //Check if we can parse the input as a number
     try {
@@ -84,7 +85,7 @@ public class PebbleGame {
       }
 
       //Check again for the exit key
-      if (key.equalsIgnoreCase("e")) System.exit(1);
+      if (key.equalsIgnoreCase("e")) System.exit(0);
 
       //Setup a new file with the given path
       File currentFile = new File(filePath);
@@ -106,6 +107,10 @@ public class PebbleGame {
           System.out.println(e.toString() + "\n");
           continue;
         }
+
+        //Set the bag names
+        newBlackBag.setName(String.valueOf((char)('X' + bagCount)));
+        newWhiteBag.setName(String.valueOf((char)('A' + bagCount)));
 
         //If we can load the bag, map the black bag as a key for the white one.
         bagMap.put(newBlackBag, newWhiteBag);
@@ -129,6 +134,8 @@ public class PebbleGame {
   class Player extends Thread{
 
     private List<Integer> hand;
+
+    private Bag previousBag;
   
     Player() {}
   
@@ -153,51 +160,94 @@ public class PebbleGame {
 
     @Override
     public void run (){
-		  while (!done){
 
+      //Create new hand
+      hand = new ArrayList<>();
+
+      //Create file or load output file
+      File outputFile = new File("player"+ Thread.currentThread().getName()+ "_output.txt");
+
+      //Create file writer.
+      FileWriter fileWriter = null;
+
+
+      //Create a new file if one doesn't exist.
+      try {
+        outputFile.createNewFile();
+        fileWriter = new FileWriter(outputFile);
+      } catch (Exception e) {
+        System.out.println("Critical error: " + e.getMessage());
+        System.exit(1);
+      }
+
+
+
+		  while (!done){
         //If the hand size is greater than 10 we remove a value at random
         if (hand.size() >= 10) {
             int index = random.nextInt(10);
+            int pebbleTemp = hand.get(index);
             hand.remove(index);
+
+            //Then place the value in the previous white bag
+            bagMap.get(previousBag).addValueToBag(pebbleTemp);
+
+            try{
+              fileWriter.write("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n");
+              fileWriter.write("player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+            }
+            catch(Exception e)
+            {
+              System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output!");
+            }
         }
 
-          //We then pick a new value to add too our hand
-          int newBagIndex = random.nextInt(currentBags.size());
-          Bag currentBag = currentBags.get(newBagIndex);
+        //We then pick a new value to add too our hand
+        int newBagIndex = random.nextInt(currentBags.size());
+        Bag currentBag = previousBag = currentBags.get(newBagIndex);
 
-          int currentPick = 0;
-          try {
-            currentPick = currentBag.pick();
-          } catch (Exception e) {
-            //If there is an error the bag is empty so we re-loop until the bag has pebbles
-            continue;
-          }
-          
-          //Add the value to the hand and the white bag
-          hand.add(currentPick);
-          bagMap.get(currentBag).addValueToBag(currentPick);
+        int currentPick = 0;
+        try {
+          currentPick = currentBag.pick();
+        } catch (Exception e) {
+          //If there is an error the bag is empty so we re-loop until the bag has pebbles
+          continue;
+        }
+        
+        //Add the value to the hand.
+        hand.add(currentPick);
 
-          //If the bag is now empty we refill it from its white bag.
-          if(currentBag.pebbleCount() <= 0){
-            //Move the pebbles from it's white bag into the black one.
-            currentBag.addListToBag(bagMap.get(currentBag).getContents());
-            //Empty the white bag.
-            bagMap.get(currentBag).emptyBag();
-          }
-          //TODO Write too a text file
+        //If the bag is now empty we refill it from its white bag.
+        if(currentBag.pebbleCount() <= 0){
+          //Move the pebbles from it's white bag into the black one.
+          currentBag.addListToBag(bagMap.get(currentBag).getContents());
+          //Empty the white bag.
+          bagMap.get(currentBag).emptyBag();
+        }
+        
+        try{
+          fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n");
+          fileWriter.write("player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+        }
+        catch(Exception e)
+        {
+          System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output! Error: " + e.toString());
+        }
 
-        if (((PebbleGame.Player) hand).sum() == 100) {
+        if (hand.stream().reduce(0, Integer::sum) == 100) {
+          System.out.println("Stopped!");
           stopThread();
-          System.out.print("Player " + Thread.currentThread() + " has won!!");
         }
 
         //Now we know the thread has made it through a move we can notify the other threads.
-        
+
         //TODO Notify threads we are now done making our move
  	 	  }
+      
     }
 
     public void stopThread() {
+      System.out.print("Player " + Thread.currentThread().getName() + " has won!\n");
       this.done = true;
     }
   }
@@ -212,15 +262,20 @@ public class PebbleGame {
    * Then assigning bags to those players.
    */
   public void createGame() {
+
+    //Create a new list of players
+    players = new ArrayList<>();
+
+    //Add as many threads as players there are
     for(int i = 0; i < playerCount; i++) {
-      players.add(new Player());
+      Player temp = new Player();
+      temp.setName(""+i);
+      players.add(temp);
     }
 
+    //Start all threads
     for(Player p : players) {
-      int randomNum = random.nextInt(currentBags.size());
-      // Bag indexBag = currentBags.keySet().toArray(new Bag[currentBags.size()])[randomNum];
-      // p.setBlackBag(indexBag);
-      // p.setWhiteBag(currentBags.get(indexBag));
+      p.start();
     }
   }
   
@@ -239,7 +294,6 @@ public class PebbleGame {
       try{
         //Load the data about the game from the start menu.
         startMenu();
-
         //This ensure we keep looping here until we make it through the start menu or exit the game.
         gamePlayable = true;
       }
@@ -248,6 +302,9 @@ public class PebbleGame {
         System.out.println(e.getMessage());
       }
     }
+
+    createGame();
+
   }
 
 }

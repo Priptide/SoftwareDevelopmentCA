@@ -10,6 +10,7 @@ public class Bag {
   private File inputFile;
   private BagType type;
   private List<Integer> contents;
+  private String bagName;
 
   /**
    * Creates a new bag object with no contents, hence an empty bag to use in the pebble game.
@@ -101,9 +102,18 @@ public class Bag {
         data = fileReader.read();
       }
       if (!currentValue.trim().equals("")) {
-        System.out.println(
-          "WARNING: A pebble value was not loaded as there was no final comma!"
-        );
+        int value = 0;
+        try {
+          value = Integer.parseInt(currentValue.trim());
+        } catch (Exception e) {
+          fileReader.close();
+          throw new Exception("You can only load values that are integers!");
+        }
+        if (value > 0) contents.add(value); else {
+          System.out.println(
+            "WARNING: Pebbles have a strictly positive weight negative values will not be loaded!"
+          );
+        }
       }
       fileReader.close();
 
@@ -137,28 +147,45 @@ public class Bag {
   }
 
   /**
-   * Used to empty white bags when refilling an empty black bag.
+   * Sets the name of the bag
+   * @param name New Bag Name
    */
-  public void emptyBag() {
+  public void setName(String name) {
+    this.bagName = name;
+  }
+
+  /**
+   * Gets the name of a given bag
+   * @return Bag Name
+   */
+  public String getName() {
+    return this.bagName;
+  }
+
+  /**
+   * Used to empty white bags when refilling an empty black bag.
+   * @apiNote This is synchronized so that it is thread safe.
+   */
+  public synchronized void emptyBag() {
     contents = new ArrayList<>();
   }
 
   /**
    *
    * Adds a single value to the current contents of the bag.
-   *
+   * @apiNote This is synchronized so that it is thread safe.
    * @param value Integer to add to the bag.
    */
-  public void addValueToBag(int value) {
+  public synchronized void addValueToBag(int value) {
     this.contents.add(value);
   }
 
   /**
    * Adds a list of values to the currents contents of the bag.
-   *
+   * @apiNote This is synchronized so that it is thread safe.
    * @param values List of values to add to the bag.
    */
-  public void addListToBag(List<Integer> values) {
+  public synchronized void addListToBag(List<Integer> values) {
     this.contents.addAll(values);
   }
 
@@ -173,7 +200,7 @@ public class Bag {
 
   /**
    * Picks a random value from the bag, removes it from it's contents and returns it too the user.
-   *
+   * @apiNote This is synchronized so that it is thread safe.
    * @return A random value for the current bag.
    */
   public synchronized int pick() throws Exception {
