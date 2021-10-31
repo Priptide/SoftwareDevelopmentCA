@@ -7,9 +7,9 @@ import java.util.Random;
 
 public class Bag {
 
-  File inputFile;
-  BagType type;
-  List<Integer> contents;
+  private File inputFile;
+  private BagType type;
+  private List<Integer> contents;
 
   /**
    * Creates a new bag object with no contents, hence an empty bag to use in the pebble game.
@@ -129,10 +129,23 @@ public class Bag {
   }
 
   /**
+   * Gives the current number of pebbles in the bag
+   * @return Number of Pebbles
+   */
+  public int pebbleCount() {
+    return contents.size();
+  }
+
+  /**
+   * Used to empty white bags when refilling an empty black bag.
+   */
+  public void emptyBag() {
+    contents = new ArrayList<>();
+  }
+
+  /**
    *
    * Adds a single value to the current contents of the bag.
-   *
-   * @apiNote Should be the only method used to add to the bag.
    *
    * @param value Integer to add to the bag.
    */
@@ -143,11 +156,8 @@ public class Bag {
   /**
    * Adds a list of values to the currents contents of the bag.
    *
-   * @deprecated Should only be used for testing.
-   *
    * @param values List of values to add to the bag.
    */
-  @Deprecated
   public void addListToBag(List<Integer> values) {
     this.contents.addAll(values);
   }

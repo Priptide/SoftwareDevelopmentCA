@@ -53,7 +53,7 @@ public class testBag {
       throw new AssertionError("Failed to load test file: " + e.getMessage());
     }
 
-    assertEquals(4, test.contents.size());
+    assertEquals(4, test.pebbleCount());
 
     assertEquals(
       "WARNING: A pebble value was not loaded as there was no final comma!",

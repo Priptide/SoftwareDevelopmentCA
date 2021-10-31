@@ -1,5 +1,6 @@
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,8 @@ public class PebbleGame {
 
   static int playerCount;
   static List<Player> players;
-  static Map<Bag, Bag> currentBags;
+  static Map<Bag, Bag> bagMap;
+  static List<Bag> currentBags;
   static boolean gamePlayable = false;
   Scanner sc = new Scanner(System.in);
 
@@ -57,7 +59,8 @@ public class PebbleGame {
     int currentPebbleCount = 0;
 
     //Reset the current bags map of black bags to white
-    currentBags = new HashMap<>();
+    bagMap = new HashMap<>();
+    currentBags = new ArrayList<>();
 
     //Set up our 3 black bags and their corresponding white bags.
     while (bagCount < 3) {
@@ -105,11 +108,12 @@ public class PebbleGame {
         }
 
         //If we can load the bag, map the black bag as a key for the white one.
-        currentBags.put(newBlackBag, newWhiteBag);
+        bagMap.put(newBlackBag, newWhiteBag);
+        currentBags.add(newBlackBag);
         
         //We then add too the bag and pebble count
         bagCount++;
-        currentPebbleCount += newBlackBag.contents.size();
+        currentPebbleCount += newBlackBag.pebbleCount();
       }
     }
 
@@ -125,8 +129,6 @@ public class PebbleGame {
   class Player extends Thread{
 
     private List<Integer> hand;
-    private Bag blackBag;
-    private Bag whiteBag;
   
     Player() {}
   
@@ -146,41 +148,52 @@ public class PebbleGame {
     public int sum() {
       return hand.stream().reduce(0, Integer::sum);
     }
-
-    public Bag getBlackBag() {
-      return blackBag;
-    }
-    public void setBlackBag(Bag blackBag) {
-      this.blackBag = blackBag;
-    }
-    public Bag getWhiteBag() {
-      return whiteBag;
-    }
-    public void setWhiteBag(Bag whiteBag) {
-      this.whiteBag = whiteBag;
-    }
-
     // This being volatile should mean that when one thread has one all the threads stop.
     private volatile boolean done = false;
 
     @Override
     public void run (){
 		  while (!done){
-        if (hand.size() < 10) {
-          try {
-            hand.add(blackBag.pick());
-          } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-          }
+
+        //If the hand size is greater than 10 we remove a value at random
+        if (hand.size() >= 10) {
+            int index = random.nextInt(10);
+            hand.remove(index);
         }
-        if (((PebbleGame.Player) hand).sum() >= 100) {
+
+          //We then pick a new value to add too our hand
+          int newBagIndex = random.nextInt(currentBags.size());
+          Bag currentBag = currentBags.get(newBagIndex);
+
+          int currentPick = 0;
+          try {
+            currentPick = currentBag.pick();
+          } catch (Exception e) {
+            //If there is an error the bag is empty so we re-loop until the bag has pebbles
+            continue;
+          }
+          
+          //Add the value to the hand and the white bag
+          hand.add(currentPick);
+          bagMap.get(currentBag).addValueToBag(currentPick);
+
+          //If the bag is now empty we refill it from its white bag.
+          if(currentBag.pebbleCount() <= 0){
+            //Move the pebbles from it's white bag into the black one.
+            currentBag.addListToBag(bagMap.get(currentBag).getContents());
+            //Empty the white bag.
+            bagMap.get(currentBag).emptyBag();
+          }
+          //TODO Write too a text file
+
+        if (((PebbleGame.Player) hand).sum() == 100) {
           stopThread();
           System.out.print("Player " + Thread.currentThread() + " has won!!");
-        } else {
-          int index = random.nextInt(10);
-          hand.remove(index);
         }
+
+        //Now we know the thread has made it through a move we can notify the other threads.
+        
+        //TODO Notify threads we are now done making our move
  	 	  }
     }
 
@@ -205,15 +218,15 @@ public class PebbleGame {
 
     for(Player p : players) {
       int randomNum = random.nextInt(currentBags.size());
-      Bag indexBag = currentBags.keySet().toArray(new Bag[currentBags.size()])[randomNum];
-      p.setBlackBag(indexBag);
-      p.setWhiteBag(currentBags.get(indexBag));
+      // Bag indexBag = currentBags.keySet().toArray(new Bag[currentBags.size()])[randomNum];
+      // p.setBlackBag(indexBag);
+      // p.setWhiteBag(currentBags.get(indexBag));
     }
   }
   
   public void play() {
     System.out.println(
-      """
+       """
         Welcome to the PebbleGame!!
         You will be asked to enter the number of players.
         and then for the location of the three files in turn containing comma separated integer values for the pebble weights.
