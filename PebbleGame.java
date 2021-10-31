@@ -15,42 +15,63 @@ public class PebbleGame {
   static boolean gamePlayable = false;
   Scanner sc = new Scanner(System.in);
 
+  /**
+   * This method is used to run through the initial start of the game to acquire the player number and load all three black bags into the game.
+   * @throws Exception For any errors that may occur when trying to load a new game
+   */
   public void startMenu() throws Exception{
 
+    //Load player numbers
     System.out.println("Please enter the number of players:");
+
+    //We setup as a blank string to help with error checking
     String key = "";
+
+    //Try and load the number of players from the user input.
     try{
       key = sc.nextLine();
     }
     catch(Exception e){
-      throw new Exception("Invalid Input!\n");
+      //If we somehow have invalid input parse it as an empty string.
+      key = "";
     }
-    currentBags = new HashMap<>();
 
+    //If the user presses E or e we quit.
     if (key.equalsIgnoreCase("e")) System.exit(1);
 
+    //Check if we can parse the input as a number
     try {
       playerCount = Integer.parseInt(key);
-      if (playerCount <= 0) {
-        throw new Exception("You can't play with zero players!\n");
-      }
     } catch (Exception e) {
-      //Invalid so we restart
+      //Invalid input so we restart
       throw new Exception("Please input a number!\n");
     }
 
+    //Check the player number is greater than zero.
+    if (playerCount <= 0) {
+      throw new Exception("You can't play with less than one player!\n");
+    }
+
+    //Create new bag and pebble counts
     int bagCount = 0;
     int currentPebbleCount = 0;
 
-    // Set up 3 Black bags containing pebbles given file inputs
+    //Reset the current bags map of black bags to white
+    currentBags = new HashMap<>();
+
+    //Set up our 3 black bags and their corresponding white bags.
     while (bagCount < 3) {
+
       System.out.println(
         "Please enter location of bag number " +
         (bagCount) +
         " to load"
       );
 
+
       String filePath = "";
+
+      //Attempt to get the next line of input as our filepath.
       try{
        filePath = sc.nextLine();
       }
@@ -59,17 +80,23 @@ public class PebbleGame {
         continue;
       }
 
+      //Check again for the exit key
       if (key.equalsIgnoreCase("e")) System.exit(1);
 
+      //Setup a new file with the given path
       File currentFile = new File(filePath);
 
-      if (!currentFile.exists()) System.out.println(
-        "The given file doesn't exist, try again!"
-      ); else {
+      //If the file doesn't exist we restart the loop
+      if (!currentFile.exists()) 
+        System.out.println("The given file doesn't exist, try again!"); 
+      else 
+      {
+
+        //Create two new bags, an empty black and empty white one
         Bag newBlackBag = new Bag(currentFile, BagType.BLACK);
         Bag newWhiteBag = new Bag(BagType.WHITE);
 
-
+        //Try to load the bag from the given file
         try {
           newBlackBag.load();
         } catch (Exception e) {
@@ -77,20 +104,23 @@ public class PebbleGame {
           continue;
         }
 
+        //If we can load the bag, map the black bag as a key for the white one.
         currentBags.put(newBlackBag, newWhiteBag);
         
+        //We then add too the bag and pebble count
         bagCount++;
         currentPebbleCount += newBlackBag.contents.size();
       }
     }
 
-    //Check the bag count is above 11 per player
+    //Check the bag count is above 11 per player if not throw an error
     int minCount = playerCount * 11;
-
     if(minCount > currentPebbleCount){
       throw new Exception("\nYou must have at least 11 pebbles per player, you were "+ (minCount - currentPebbleCount) +" pebbles short!\nPlease try again!\n");
     }
   }
+
+
 
   class Player extends Thread{
 
@@ -194,10 +224,14 @@ public class PebbleGame {
     
     while(!gamePlayable){
       try{
+        //Load the data about the game from the start menu.
         startMenu();
+
+        //This ensure we keep looping here until we make it through the start menu or exit the game.
         gamePlayable = true;
       }
       catch(Exception e){
+        //If we get an error print it and loop again.
         System.out.println(e.getMessage());
       }
     }
