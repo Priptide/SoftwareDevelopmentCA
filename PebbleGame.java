@@ -9,6 +9,8 @@ import java.util.Scanner;
 
 import java.util.Random;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class PebbleGame {
 
   static int playerCount;
@@ -19,6 +21,8 @@ public class PebbleGame {
   Scanner sc = new Scanner(System.in);
   // This being volatile should mean that when one thread has one all the threads stop.
   public volatile boolean done = false;
+  // This is Atomic to enable each player to have a single turn at a time.
+  public AtomicInteger threadCount = new AtomicInteger(0);
 
   /**
    * This method is used to run through the initial start of the game to acquire the player number and load all three black bags into the game.
@@ -181,8 +185,8 @@ public class PebbleGame {
       }
 
 
-
-		  while (!done){
+      // If the thread count is not equal to their 
+		  while (!done && threadCount.get() == parseInt(Thread.currentThread().getName())){
 
         //If the hand size is greater than 10 we remove a value at random
         if (hand.size() >= 10) {
@@ -195,7 +199,7 @@ public class PebbleGame {
 
             //Write changes too the log
             try{
-              fileWriter.write("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+              //fileWriter.write("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
             }
             catch(Exception e)
             {
@@ -214,7 +218,7 @@ public class PebbleGame {
           //Refill the empty bag causing the error
           currentBag.addListToBag(bagMap.get(currentBag).getContents());
           bagMap.get(currentBag).emptyBag();
-          //If there is an error the bag is empty so we re-loop until the bag has pebbles
+          //If  so we re-lothere is an error the bag is emptyop until the bag has pebbles
           continue;
         }
         
@@ -231,7 +235,7 @@ public class PebbleGame {
         
         //Write all moves too the log
         try{
-          fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+          //fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
         }
         catch(Exception e)
         {
@@ -242,6 +246,14 @@ public class PebbleGame {
           // System.out.print("Player " + Thread.currentThread().getName() + " has won!\n");
           // this.done = true;
           stopThread();
+        }
+
+        // Should increment the thread count and then allow the next players turn.
+        // Also if the last player takes their turn it shall reset. 
+        if (threadCount.get() >= (playerCount - 1)) {
+          threadCount.set(0);
+        } else {
+          threadCount.incrementAndGet();
         }
 
         //Now we know the thread has made it through a move we can notify the other threads.
@@ -274,7 +286,7 @@ public class PebbleGame {
     //Add as many threads as players there are
     for(int i = 0; i < playerCount; i++) {
       Player temp = new Player();
-      temp.setName(""+i);
+      temp.setName(String.valueOf(i));
       players.add(temp);
     }
 
