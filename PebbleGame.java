@@ -199,7 +199,7 @@ public class PebbleGame {
 
             //Write changes too the log
             try{
-              //fileWriter.write("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+              fileWriter.write("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
             }
             catch(Exception e)
             {
@@ -235,7 +235,7 @@ public class PebbleGame {
         
         //Write all moves too the log
         try{
-          //fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+          fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
         }
         catch(Exception e)
         {
