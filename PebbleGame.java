@@ -186,8 +186,9 @@ public class PebbleGame {
 
 
       // If the thread count is not equal to their 
-		  while (!done && threadCount.get() == parseInt(Thread.currentThread().getName())){
+		  while (!done){
 
+        while(threadCount.get() == Integer.parseInt(Thread.currentThread().getName())){
         //If the hand size is greater than 10 we remove a value at random
         if (hand.size() >= 10) {
             int index = random.nextInt(10);
@@ -260,6 +261,7 @@ public class PebbleGame {
 
         //TODO Notify threads we are now done making our move
  	 	  }
+    }
       
     }
 
