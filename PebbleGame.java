@@ -1,7 +1,9 @@
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PebbleGame {
 
+  //All publicly available variables needed for all players/game management
   static int playerCount;
   static List<Player> players;
   static Map<Bag, Bag> bagMap;
@@ -154,10 +157,12 @@ public class PebbleGame {
       this.hand = hand;
     }
 
+    //Returns the current numbers of pebbles in the hand
     public int handSize() {
       return hand.size();
     }
 
+    //Returns the current hand sum
     public int sum() {
       return hand.stream().reduce(0, Integer::sum);
     }
@@ -174,11 +179,17 @@ public class PebbleGame {
       //Create file writer.
       FileWriter fileWriter = null;
 
+      //Create a buffered output writer
+      BufferedWriter outputWrite = null;
+
+      //Create a string builder for the file writing.
+      StringBuilder msgBuilder = new StringBuilder();
 
       //Create a new file if one doesn't exist.
       try {
         outputFile.createNewFile();
         fileWriter = new FileWriter(outputFile);
+        outputWrite = new BufferedWriter(fileWriter);
       } catch (Exception e) {
         System.out.println("Critical error: " + e.getMessage());
         System.exit(1);
@@ -189,37 +200,46 @@ public class PebbleGame {
 		  while (!done){
 
         while(threadCount.get() == Integer.parseInt(Thread.currentThread().getName())){
-        //If the hand size is greater than 10 we remove a value at random
+        //If the hand size is greater than 10 we a value depending on our sum.
         if (hand.size() >= 10) {
-            int index = random.nextInt(10);
+            //Get the current sum and sort the hand
+            int currentSum = sum();
+            Collections.sort(hand);
+
+            //By default we remove the smallest value.
+            int index = 0;
+
+            //If we are above 100 total then we remove the largest value.
+            if(currentSum > 100){
+              index = handSize()-1;
+            }
+
+            //Remove this value but keep it locally stored.
             int pebbleTemp = hand.get(index);
             hand.remove(index);
 
-            //Then place the value in the previous white bag
+            //Then place the value in the previous white bag.
             bagMap.get(previousBag).addValueToBag(pebbleTemp);
 
-            //Write changes too the log
-            try{
-              fileWriter.write("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
-            }
-            catch(Exception e)
-            {
-              System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output!");
-            }
+            //Write changes too the message builder.
+            msgBuilder.append("player" + Thread.currentThread().getName() + " has discarded a " + pebbleTemp + " to bag " + bagMap.get(previousBag).getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+            
         }
 
-        //We then pick a new value to add too our hand
+        //We then pick a new value to add too our hand.
         int newBagIndex = random.nextInt(currentBags.size());
         Bag currentBag = previousBag = currentBags.get(newBagIndex);
 
+        //Set our current pick too zero.
         int currentPick = 0;
+
+        //Attempt to pick from a bag, if we get an error we know the bag is empty.
         try {
           currentPick = currentBag.pick();
         } catch (Exception e) {
-          //Refill the empty bag causing the error
+          //Refill the empty bag causing the error and continue to pick again.
           currentBag.addListToBag(bagMap.get(currentBag).getContents());
           bagMap.get(currentBag).emptyBag();
-          //If  so we re-lothere is an error the bag is emptyop until the bag has pebbles
           continue;
         }
         
@@ -233,20 +253,38 @@ public class PebbleGame {
           //Empty the white bag.
           bagMap.get(currentBag).emptyBag();
         }
+
+        //Write the drawing move
+        msgBuilder.append("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
         
-        //Write all moves too the log
+        
+
+        if (sum() == 100 && hand.size() == 10) {
+          //Write final moves too the log/
+          try{
+            outputWrite.write(msgBuilder.toString());
+            outputWrite.flush();
+            outputWrite.close();
+          }
+          catch(Exception e)
+          {
+            //Warn of an error.
+            System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output! Error: " + e.toString());
+          }
+          // Stop all threads and finish this thread.
+          stopThread();
+          return;
+        }
+
+        //Otherwise we now write too the log and reset the string builder.
         try{
-          fileWriter.write("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
+          outputWrite.write(msgBuilder.toString());
+          msgBuilder = new StringBuilder();
         }
         catch(Exception e)
         {
+          //Warn of an error.
           System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output! Error: " + e.toString());
-        }
-
-        if (hand.stream().reduce(0, Integer::sum) == 100 && hand.size() == 10) {
-          // System.out.print("Player " + Thread.currentThread().getName() + " has won!\n");
-          // this.done = true;
-          stopThread();
         }
 
         // Should increment the thread count and then allow the next players turn.
@@ -256,15 +294,24 @@ public class PebbleGame {
         } else {
           threadCount.incrementAndGet();
         }
-
-        //Now we know the thread has made it through a move we can notify the other threads.
-
-        //TODO Notify threads we are now done making our move
  	 	  }
+    }
+
+    //We flush the data this will write any data left too the outputs.
+    try{
+      outputWrite.write(msgBuilder.toString());
+      outputWrite.flush();
+      outputWrite.close();
+    }
+    catch(Exception e)
+    {
+      //Warn of an error.
+      System.out.println("Player "  + Thread.currentThread().getName() + " couldn't write to output! Error: " + e.toString());
     }
       
     }
 
+    //Tells the user which player won and stops all threads
     public void stopThread() {
       System.out.print("Player " + Thread.currentThread().getName() + " has won!\n");
       done = true;
@@ -288,6 +335,7 @@ public class PebbleGame {
     //Add as many threads as players there are
     for(int i = 0; i < playerCount; i++) {
       Player temp = new Player();
+      //Set the name of the players as their player number.
       temp.setName(String.valueOf(i));
       players.add(temp);
     }
@@ -322,6 +370,7 @@ public class PebbleGame {
       }
     }
 
+    //Now we create the game and play it.
     createGame();
 
   }
