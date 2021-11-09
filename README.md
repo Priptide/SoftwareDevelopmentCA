@@ -7,7 +7,7 @@ Requirements:
 
 - [x] The process of drawing pebbles from a black bag should be uniformly at random – that is it should be equally probable to draw any of the pebbles in the bag. 
 
-- [x] The players should act as concurrent threads, with the threading commencing before drawing their initial pebbles. 
+- [ ] The players should act as concurrent threads, with the threading commencing before drawing their initial pebbles. 
 
 - [x] Players should be implemented as nested classes within a PebbleGame application. 
 
@@ -20,4 +20,8 @@ Requirements:
 
 To-do:
 
-- [ ] Cleanup comments
+- [ ] Make a variable to check all threads are started before beginning the game.
+
+- [ ] Write test cases for the PebbleGame java file.
+
+- [x] Make variable to check that all players have made their moves before going onto the next turn.
