@@ -7,6 +7,7 @@ import java.net.URL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+// We have used JUnit 4 for our implementation of testing.
 
 public class testBag {
 
