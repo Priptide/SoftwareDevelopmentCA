@@ -225,6 +225,9 @@ public class PebbleGame {
             
         }
 
+        //If the hand is less than 10 we keep picking till we have a full hand.
+        //Used when starting the round to make sure the player picks all of the pebbles
+      while(handSize() < 10){
         //We then pick a new value to add too our hand.
         int newBagIndex = random.nextInt(currentBags.size());
         Bag currentBag = previousBag = currentBags.get(newBagIndex);
@@ -255,7 +258,7 @@ public class PebbleGame {
 
         //Write the drawing move
         msgBuilder.append("player" + Thread.currentThread().getName() + " has drawn a " + currentPick + " from bag " + currentBag.getName() + "\n" + "player" + Thread.currentThread().getName() + " hand is " + hand.toString() + "\n");
-        
+      }
         
 
         if (sum() == 100 && hand.size() == 10) {
